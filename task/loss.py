@@ -5,16 +5,14 @@ from utils.misc import make_input
 
 class MAELoss(torch.nn.Module):
     """
-    loss for MEA
-    mask is used to mask off the crowds in coco dataset
+    loss for MAE
     """
     def __init__(self):
-        super(HeatmapLoss, self).__init__()
+        super(MAELoss, self).__init__()
 
     def forward(self, pred, gt, masks):
         assert pred.size() == gt.size()
-        l = (pred * gt).sum(dim = 3) / (torch.norm(pred, 2, 3) * torch.norm(gt, 2, 3)) * masks[:, :]
-        l = l.mean(dim=2).mean(dim=1)
+        l = (1 - (pred * gt).sum(dim = 3) / (torch.norm(pred, 2, 3) * torch.norm(gt, 2, 3) ) ) * masks        l = l.mean(dim=2).mean(dim=1)
         return l
 
 class HeatmapLoss(torch.nn.Module):
