@@ -15,7 +15,7 @@ class Merge(nn.Module):
 
 class SNNet(nn.Module):
     def __init__(self, nstack, inp_dim, oup_dim, bn=False, increase=128, **kwargs):
-        super(PoseNet, self).__init__()
+        super(SNNet, self).__init__()
         self.pre = nn.Sequential(
             Conv(3, 64, 7, 2, bn=bn),
             Conv(64, 128, bn=bn),
