@@ -37,7 +37,7 @@ class SNNet(nn.Module):
         self.nstack = nstack
         #self.myAEloss = AEloss()
         #self.heatmapLoss = HeatmapLoss()
-        self.mae_loss = MAELoss
+        self.mae_loss = MAELoss()
 
     def forward(self, imgs):
         x = imgs.permute(0, 3, 1, 2)
@@ -50,9 +50,15 @@ class SNNet(nn.Module):
                 x = x + self.merge_preds[i](preds[-1]) + self.merge_features[i](feature)
         return torch.stack(preds, 1)
 
-    def calc_loss(self, preds, keypoints=None, heatmaps = None, masks = None):
+    def calc_loss(self, preds, masks, gts):
         """
         TODO: calculate MAE loss here.
+        """
+        mae_loss = []
+        for i in range(self.nstack):
+            mae_loss.append(self.mae_loss(preds[:, i], masks, gts))
+
+        return mae_loss
         """
         dets = preds[:,:,:17]
         tags = preds[:,:,17:34]
@@ -69,5 +75,7 @@ class SNNet(nn.Module):
         detection_loss = []
         for i in range(self.nstack):
             detection_loss.append( self.heatmapLoss(dets[:,i], heatmaps, masks) )
+
         detection_loss = torch.stack(detection_loss, dim=1)
         return tag_loss[:,:,0], tag_loss[:,:,1], detection_loss
+        """
