@@ -25,7 +25,7 @@ class Dataset(torch.utils.data.Dataset):
 
         img = ds.load_image(idx)
         mask = ds.load_mask(idx)
-        gt = ds.load_mask(gt)
+        gt = ds.load_gt(idx)
         return img, mask, gt
         """
         inp = ds.load_image(idx)

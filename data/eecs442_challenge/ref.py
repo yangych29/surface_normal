@@ -4,9 +4,12 @@ import h5py
 from scipy.misc import imread
 import os
 
-data_dir = '/eecs442_challenge'
+data_dir = os.path.expanduser('~/eecs442challenge/')
 
 assert os.path.exists(data_dir)
+
+def init():
+    pass
 
 def initialize(opt):
     return
