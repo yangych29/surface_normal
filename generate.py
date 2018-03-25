@@ -10,7 +10,7 @@ import train as net
 
 def evaluate():
     test = ds.get_test_set()
-    func, config = train_net.init()
+    func, config = net.init()
 
     for idx in test:
         img = ds.load_image(idx, False)
