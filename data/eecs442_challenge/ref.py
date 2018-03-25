@@ -28,5 +28,11 @@ def load_gt(idx):
 
 def setup_val_split(opt = None):
     train = range(20000)
-    valid = []
-    return train, np.array(valid)
+    return train, train
+
+if __name__ == '__main__':
+    im = load_image(1)
+    mask = load_mask(1)
+    mask = mask /255
+    mask = mask > 0.5
+    import pdb; pdb.set_trace()

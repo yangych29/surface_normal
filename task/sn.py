@@ -14,8 +14,8 @@ __config__ = {
     'network': 'models.snnet.SNNet',
     'inference': {
         'nstack': 4,
-        'inp_dim': 128,
-        'oup_dim': 64,
+        'inp_dim': 3,
+        'oup_dim': 3,
         'num_parts': 3,
         'increase': 128,
         'keys': ['imgs']
@@ -24,7 +24,7 @@ __config__ = {
     'train': {
         'batchsize': 4,
         'input_res': 128,
-        'output_res': 64,
+        'output_res': 32,
         'train_iters': 1000,
         'valid_iters': 10,
         'learning_rate': 1e-4,

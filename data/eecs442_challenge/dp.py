@@ -4,6 +4,7 @@ import os
 import torch
 import numpy as np
 from utils.misc import get_transform, kpt_affine
+from utils.misc import resize
 import torch.utils.data
 
 class Dataset(torch.utils.data.Dataset):
@@ -22,11 +23,20 @@ class Dataset(torch.utils.data.Dataset):
 
     def loadImage(self, idx):
         ds = self.ds
+        img = ds.load_image(idx)/255
 
-        img = ds.load_image(idx)
         mask = ds.load_mask(idx)
+        mask = mask[np.newaxis, :]
+        mask = resize(mask, (self.output_res, self.output_res))
+        mask = mask[0]
+        mask = mask / 255
+
         gt = ds.load_gt(idx)
-        return img, mask, gt
+        gt = gt[np.newaxis, :]
+        gt = resize(gt, (self.output_res, self.output_res))
+        gt = gt[0]
+        gt = gt / 255
+        return img.astype(np.float32), mask.astype(np.float32), gt.astype(np.float32)
         """
         inp = ds.load_image(idx)
         mask = ds.get_mask(idx).astype(np.float32)

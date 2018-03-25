@@ -54,9 +54,10 @@ class SNNet(nn.Module):
         """
         TODO: calculate MAE loss here.
         """
+        preds = preds.permute(0, 3, 4, 2, 1)
         mae_loss = []
         for i in range(self.nstack):
-            mae_loss.append(self.mae_loss(preds[:, i], masks, gts))
+            mae_loss.append(self.mae_loss(preds[:, :, :, :, i], masks, gts))
 
         return mae_loss
         """

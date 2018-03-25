@@ -10,7 +10,7 @@ class MAELoss(torch.nn.Module):
     def __init__(self):
         super(MAELoss, self).__init__()
 
-    def forward(self, pred, gt, masks):
+    def forward(self, pred, masks, gt):
         assert pred.size() == gt.size()
         l = (1 - (pred * gt).sum(dim = 3) / (torch.norm(pred, 2, 3) * torch.norm(gt, 2, 3) ) ) * masks        
         l = l.mean(dim=2).mean(dim=1)
