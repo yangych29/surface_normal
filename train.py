@@ -90,6 +90,7 @@ def train(train_func, data_func, config, post_epoch=None):
                 datas = next(generator)
                 outs = train_func(batch_id + i, config, phase, **datas)
         config['train']['epoch'] += 1
+        #if config['train']['epoch'] % 100 == 0:
         save(config)
 
 def init():

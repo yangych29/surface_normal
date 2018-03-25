@@ -4,7 +4,7 @@ import h5py
 from scipy.misc import imread
 import os
 
-data_dir = os.path.expanduser('~/eecs442challenge/')
+data_dir = os.path.expanduser('~/datasets/eecs442challenge/')
 
 assert os.path.exists(data_dir)
 
@@ -33,9 +33,9 @@ def load_gt(idx):
     return imread(p,mode='RGB')
 
 def setup_val_split(opt = None):
-    train = range(20000)
-    valid = []
-    return train, np.array(valid)
+    train = range(2000, 20000)
+    #train = range(10)
+    return train, train
 
 def get_test_set():
     return range(2000)

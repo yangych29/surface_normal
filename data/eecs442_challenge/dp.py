@@ -23,7 +23,7 @@ class Dataset(torch.utils.data.Dataset):
 
     def loadImage(self, idx):
         ds = self.ds
-        img = ds.load_image(idx)/255
+        img = (ds.load_image(idx) / 255 - 0.5) * 2
 
         mask = ds.load_mask(idx)
         mask = mask[np.newaxis, :]
@@ -35,7 +35,7 @@ class Dataset(torch.utils.data.Dataset):
         gt = gt[np.newaxis, :]
         gt = resize(gt, (self.output_res, self.output_res))
         gt = gt[0]
-        gt = gt / 255
+        gt = (gt / 255 - 0.5) * 2
         return img.astype(np.float32), mask.astype(np.float32), gt.astype(np.float32)
         """
         inp = ds.load_image(idx)

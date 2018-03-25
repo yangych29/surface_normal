@@ -14,8 +14,9 @@ def evaluate():
     func, config = net.init()
 
     for idx in test:
-        img = ds.load_image(idx, False)
-        img = img / 255
+        img = ds.load_image(idx, True)
+        #imsave('./save/origin_{}.png'.format(idx), img)
+        img = (img / 255 - 0.5) * 2
         img = img.astype(np.float32)
         img = img[None, :, :, :]
         img = torch.FloatTensor(img)
@@ -26,11 +27,11 @@ def evaluate():
         for i in range(3):
             pred[:,:,i] = pred[:,:,i] / torch.norm(pred, 2, 2)
 
-        pred = pred * 255
+        pred = (pred / 2 + 0.5) * 255
         pred = pred.numpy()
         pred = pred.astype(np.uint8)
         pred = imresize(pred, (128, 128))
-        imsave('./save/pred_{}.png'.format(idx), pred)
+        imsave('./save/{}.png'.format(idx), pred)
 
 
 if __name__=='__main__':
