@@ -14,12 +14,18 @@ def init():
 def initialize(opt):
     return
 
-def load_image(idx):
-    p = os.path.join(data_dir, 'train', 'color', str(idx) + '.png')
+def load_image(idx, is_train=True):
+    if is_train:
+        p = os.path.join(data_dir, 'train', 'color', str(idx) + '.png')
+    else:
+        p = os.path.join(data_dir, 'test', 'color', str(idx) + '.png')
     return imread(p,mode='RGB')
 
-def load_mask(idx):
-    p = os.path.join(data_dir, 'train', 'mask', str(idx) + '.png')
+def load_mask(idx, is_train=True):
+    if is_train:
+        p = os.path.join(data_dir, 'train', 'mask', str(idx) + '.png')
+    else:
+        p = os.path.join(data_dir, 'test', 'mask', str(idx) + '.png')
     return imread(p,mode='L')
 
 def load_gt(idx):
@@ -28,11 +34,8 @@ def load_gt(idx):
 
 def setup_val_split(opt = None):
     train = range(20000)
-    return train, train
+    valid = []
+    return train, np.array(valid)
 
-if __name__ == '__main__':
-    im = load_image(1)
-    mask = load_mask(1)
-    mask = mask /255
-    mask = mask > 0.5
-    import pdb; pdb.set_trace()
+def get_test_set():
+    return range(2000)
