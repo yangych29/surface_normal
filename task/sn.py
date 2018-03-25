@@ -14,7 +14,7 @@ __config__ = {
     'network': 'models.snnet.SNNet',
     'inference': {
         'nstack': 4,
-        'inp_dim': 32,
+        'inp_dim': 256,
         'oup_dim': 3,
         'num_parts': 3,
         'increase': 128,
