@@ -1,4 +1,5 @@
 dataset/
+datasets/
 *.zip
 .vscode/
 test
