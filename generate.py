@@ -10,7 +10,7 @@ import train as net
 
 def evaluate():
     #test = ds.get_test_set()
-    test = range(10)
+    test = range(1000)
     func, config = net.init()
 
     for idx in test:
