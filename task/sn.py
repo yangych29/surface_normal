@@ -22,10 +22,10 @@ __config__ = {
     },
 
     'train': {
-        'batchsize': 100,
+        'batchsize': 20,
         'input_res': 128,
-        'output_res': 64,
-        'train_iters': 180,
+        'output_res': 128,
+        'train_iters': 900,
         'valid_iters': 0,
         'learning_rate': 1e-4,
         'num_loss': 1,
