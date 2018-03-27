@@ -14,8 +14,8 @@ class MAELoss(torch.nn.Module):
         assert pred.size() == gt.size()
         epsilon = 0.0001
         l = (1 - (pred * gt).sum(dim = 3) / ( torch.norm(pred, 2, 3) * torch.norm(gt, 2, 3) ) ) * masks
-        ##l = torch.clamp(l, -1 + epsilon, 1 - epsilon)
-        ##l = torch.acos(l)
+        l = torch.clamp(l, -1 + epsilon, 1 - epsilon)
+        l = torch.acos(l)
         l = l.mean(dim=2).mean(dim=1)
         return l
 
