@@ -19,7 +19,7 @@ class SNNet(nn.Module):
         self.pre = nn.Sequential(
             Conv(3, 64, 7, 1, bn=bn),
             Conv(64, 128, bn=bn),
-            #Pool(2, 2),
+            Pool(2, 2),
             Conv(128, 128, bn=bn),
             Conv(128, inp_dim, bn=bn)
         )

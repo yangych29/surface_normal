@@ -24,10 +24,10 @@ __config__ = {
     'train': {
         'batchsize': 30,
         'input_res': 128,
-        'output_res': 128,
+        'output_res': 64,
         'train_iters': 600,
         'valid_iters': 0,
-        'learning_rate': 1e-4,
+        'learning_rate': 1e-3,
         'num_loss': 1,
         'loss': [
             ['mae_loss', 1],
