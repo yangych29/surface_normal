@@ -27,7 +27,7 @@ __config__ = {
         'output_res': 64,
         'train_iters': 180,
         'valid_iters': 0,
-        'learning_rate': 1e-3,
+        'learning_rate': 2e-4,
         'num_loss': 1,
         'loss': [
             ['mae_loss', 1],
