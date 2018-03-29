@@ -3,9 +3,11 @@ import sys
 import os
 import torch
 import numpy as np
-from utils.misc import get_transform, kpt_affine
-from utils.misc import resize
 import torch.utils.data
+from scipy.misc import imresize, imsave
+
+from utils.misc import get_transform, kpt_affine
+
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, config, ds, index):
@@ -23,63 +25,44 @@ class Dataset(torch.utils.data.Dataset):
 
     def loadImage(self, idx):
         ds = self.ds
-        img = (ds.load_image(idx) / 255 - 0.5) * 2
+        # load image
+        #img = (ds.load_image(idx) / 255 - 0.5) * 2
+        img = ds.load_image(idx)
 
-        mask = ds.load_mask(idx)
-        mask = mask[np.newaxis, :]
-        mask = resize(mask, (self.output_res, self.output_res))
-        mask = mask[0]
-        mask = mask / 255
-
-        gt = ds.load_gt(idx)
-        gt = gt[np.newaxis, :]
-        gt = resize(gt, (self.output_res, self.output_res))
-        gt = gt[0]
-        gt = (gt / 255 - 0.5) * 2
-        return img.astype(np.float32), mask.astype(np.float32), gt.astype(np.float32)
-        """
-        inp = ds.load_image(idx)
-        mask = ds.get_mask(idx).astype(np.float32)
-
-        ann = ds.get_anns(idx)
-        keypoints = ds.get_keypoints(idx, ann)
-
-        keypoints2 = [i for i in keypoints if np.sum(i[:, 2]>0)>1]
-
-        height, width = inp.shape[0:2]
+        # data argumentation
+        height, width, _ = img.shape
         center = np.array((width/2, height/2))
         scale = max(height, width)/200
-
         inp_res = self.input_res
         res = (inp_res, inp_res)
-
         aug_rot = (np.random.random() * 2 - 1) * 30.
+        #aug_rot = 0.0
         aug_scale = np.random.random() * (1.25 - 0.75) + 0.75
+        #aug_scale = 1.0
         scale *= aug_scale
-
         dx = np.random.randint(-40 * scale, 40 * scale)/center[0]
         dy = np.random.randint(-40 * scale, 40 * scale)/center[1]
         center[0] += dx * center[0]
         center[1] += dy * center[1]
+        trans = get_transform(center, scale, (self.output_res, self.output_res), aug_rot)[:2]
 
-        mat_mask = get_transform(center, scale, (self.output_res, self.output_res), aug_rot)[:2]
-        mask = cv2.warpAffine((mask*255).astype(np.uint8), mat_mask, (self.output_res, self.output_res))/255
-        mask = (mask > 0.5).astype(np.float32)
+        # for img
+        img = cv2.warpAffine(img.astype(np.uint8), trans, (self.output_res, self.output_res))
+        img = (img / 255 - 0.5) * 2
 
-        mat = get_transform(center, scale, res, aug_rot)[:2]
-        inp = cv2.warpAffine(inp, mat, res).astype(np.float32)/255
-        keypoints[:,:,0:2] = kpt_affine(keypoints[:,:,0:2], mat_mask)
+        # for mask
+        mask = ds.load_mask(idx)
+        mask = cv2.warpAffine(mask.astype(np.uint8), trans, (self.output_res, self.output_res))
+        mask = mask / 255
+        mask[mask >= 0.5] = 1.0
+        mask[mask < 0.5] = 0.0
 
-        if np.random.randint(2) == 0:
-            inp = inp[:, ::-1]
-            mask = mask[:, ::-1]
-            keypoints = keypoints[:, ds.flipRef]
-            keypoints[:, :, 0] = self.output_res - keypoints[:, :, 0]
+        # ground true
+        gt = ds.load_gt(idx)
+        gt = cv2.warpAffine(gt.astype(np.uint8), trans, (self.output_res, self.output_res))
+        gt = (gt / 255 - 0.5) * 2
 
-        heatmaps = self.generateHeatmap(keypoints)
-        keypoints = self.keypointsRef(keypoints, self.output_res)
-        return self.preprocess(inp).astype(np.float32), mask.astype(np.float32), keypoints.astype(np.int32), heatmaps.astype(np.float32)
-        """
+        return img.astype(np.float32), mask.astype(np.float32), gt.astype(np.float32)
 
     """
     def preprocess(self, data):
@@ -135,3 +118,31 @@ def init(config):
             }
 
     return lambda key: gen(key)
+
+if __name__ == "__main__":
+    cf = {
+        'inference': {
+            'nstack': 8,
+            'inp_dim': 256,
+            'oup_dim': 3,
+            'num_parts': 3,
+            'increase': 128,
+            'keys': ['imgs']
+        },
+        'train': {
+            'batchsize': 30,
+            'input_res': 128,
+            'output_res': 64,
+            'train_iters': 600,
+            'valid_iters': 0,
+            'num_workers': 2,
+            'use_data_loader': True,
+        },
+    }
+    func = init(cf)('train')
+    for data in func:
+        for i in range(5):
+            imsave("{}_color.png".format(i), data['imgs'][i])
+            imsave("{}_mask.png".format(i), data['masks'][i])
+            imsave("{}_normal.png".format(i), data['gts'][i])
+        exit(0)
