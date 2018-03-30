@@ -3,18 +3,17 @@ import torch
 import tqdm
 import os
 import numpy as np
+from tqdm import tqdm
 from scipy.misc import imsave, imresize
 
 import data.eecs442_challenge.ref as ds
 import train as net
 
-def evaluate():
-    #test = ds.get_test_set()
-    test = range(1000)
+def generate(test_set, is_train=True):
     func, config = net.init()
 
-    for idx in test:
-        img = ds.load_image(idx, True)
+    for idx in tqdm(test_set):
+        img = ds.load_image(idx, is_train)
         #imsave('./save/origin_{}.png'.format(idx), img)
         img = (img / 255 - 0.5) * 2
         img = img.astype(np.float32)
@@ -35,4 +34,5 @@ def evaluate():
 
 
 if __name__=='__main__':
-    evaluate()
+    test_set = range(2000)
+    generate(test_set, False)
