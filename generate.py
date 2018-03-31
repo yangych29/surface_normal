@@ -34,5 +34,5 @@ def generate(test_set, is_train=True):
 
 
 if __name__=='__main__':
-    test_set = range(2000)
-    generate(test_set, False)
+    test_set = range(0,1000)
+    generate(test_set, True)
