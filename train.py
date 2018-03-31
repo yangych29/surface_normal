@@ -61,7 +61,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
         shutil.copyfile(filename, 'model_best.pth.tar')
 
 def save(config):
-    resume = os.path.join('exp', config['opt'].exp)
+    resume = os.path.join('exp', config['opt'].exp + '_' + str(config['train']['epoch']))
     resume_file = os.path.join(resume, 'checkpoint.pth.tar')
 
     save_checkpoint({

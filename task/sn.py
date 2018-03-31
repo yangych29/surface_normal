@@ -13,7 +13,7 @@ __config__ = {
     'data_provider': 'data.eecs442_challenge.dp',
     'network': 'models.snnet.SNNet',
     'inference': {
-        'nstack': 8,
+        'nstack': 6,
         'inp_dim': 256,
         'oup_dim': 3,
         'num_parts': 3,
@@ -22,10 +22,10 @@ __config__ = {
     },
 
     'train': {
-        'batchsize': 30,
+        'batchsize': 10,
         'input_res': 128,
-        'output_res': 64,
-        'train_iters': 600,
+        'output_res': 128,
+        'train_iters': 1800,
         'valid_iters': 0,
         'learning_rate': 2e-4,
         'num_loss': 1,

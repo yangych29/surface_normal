@@ -54,7 +54,7 @@ class Dataset(torch.utils.data.Dataset):
         # for mask
         mask = ds.load_mask(idx)
         #mask = cv2.warpAffine(mask.astype(np.uint8), trans2, (self.output_res, self.output_res))
-        mask = imresize(mask, (self.output_res, self.output_res))
+        #mask = imresize(mask, (self.output_res, self.output_res))
         mask = mask / 255
         mask[mask >= 0.5] = 1.0
         mask[mask < 0.5] = 0.0
@@ -62,7 +62,7 @@ class Dataset(torch.utils.data.Dataset):
         # ground true
         gt = ds.load_gt(idx)
         #gt = cv2.warpAffine(gt.astype(np.uint8), trans2, (self.output_res, self.output_res))
-        gt = imresize(gt, (self.output_res, self.output_res))
+        #gt = imresize(gt, (self.output_res, self.output_res))
         gt = (gt / 255 - 0.5) * 2
 
         return img.astype(np.float32), mask.astype(np.float32), gt.astype(np.float32)

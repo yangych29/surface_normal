@@ -29,7 +29,7 @@ def generate(test_set, is_train=True):
         pred = (pred / 2 + 0.5) * 255
         pred = pred.numpy()
         pred = pred.astype(np.uint8)
-        pred = imresize(pred, (128, 128))
+        #pred = imresize(pred, (128, 128))
         imsave('./save/{}.png'.format(idx), pred)
 
 
