@@ -18,7 +18,8 @@ class MAELoss(torch.nn.Module):
         l = torch.clamp(l, -1 + epsilon, 1 - epsilon)
         l = torch.acos(l)
         l = l.mean(dim=2).mean(dim=1)
-        return l
+        eucli_l = (((gt - pred) ** 2).mean(dim=3) * masks).mean(dim=2).mean(dim=1)
+        return l + eucli_l
 
 
 def test_mae_loss():
