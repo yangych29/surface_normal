@@ -33,7 +33,7 @@ def load_gt(idx):
     return imread(p,mode='RGB')
 
 def setup_val_split(opt = None):
-    train = range(2000, 20000)
+    train = range(0, 19000)
     #train = range(10)
     return train, train
 

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 rm -rf save
 mkdir save
 python generate.py -c sn_full_17 -e sn_full_17 -t sn

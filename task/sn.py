@@ -13,7 +13,7 @@ __config__ = {
     'data_provider': 'data.eecs442_challenge.dp',
     'network': 'models.snnet.SNNet',
     'inference': {
-        'nstack': 6,
+        'nstack': 8,
         'inp_dim': 256,
         'oup_dim': 3,
         'num_parts': 3,
