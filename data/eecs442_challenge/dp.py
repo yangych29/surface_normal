@@ -26,34 +26,33 @@ class Dataset(torch.utils.data.Dataset):
     def loadImage(self, idx):
         ds = self.ds
         # load image
-        #img = (ds.load_image(idx) / 255 - 0.5) * 2
         img = ds.load_image(idx)
 
         # data argumentation
-        #height, width, _ = img.shape
-        #center = np.array((width/2, height/2))
-        #scale = max(height, width)/200
-        #inp_res = self.input_res
-        #res = (inp_res, inp_res)
-        #aug_rot = (np.random.random() * 2 - 1) * 30.
-        #aug_rot = 0.0
-        #aug_scale = np.random.random() * (1.25 - 0.75) + 0.75
-        #aug_scale = 1.0
-        #scale *= aug_scale
-        #dx = np.random.randint(-40 * scale, 40 * scale)/center[0]
-        #dy = np.random.randint(-40 * scale, 40 * scale)/center[1]
-        #center[0] += dx * center[0]
-        #center[1] += dy * center[1]
-        #trans1 = get_transform(center, scale, (self.input_res, self.input_res), aug_rot)[:2]
-        #trans2 = get_transform(center, scale, (self.output_res, self.output_res), aug_rot)[:2]
+        height, width, _ = img.shape
+        center = np.array((width/2, height/2))
+        scale = max(height, width)/200
+        inp_res = self.input_res
+        res = (inp_res, inp_res)
+        aug_rot = (np.random.random() * 2 - 1) * 30.
+        aug_rot = 0.0
+        aug_scale = np.random.random() * (1.25 - 0.75) + 0.75
+        aug_scale = 1.0
+        scale *= aug_scale
+        dx = np.random.randint(-40 * scale, 40 * scale)/center[0]
+        dy = np.random.randint(-40 * scale, 40 * scale)/center[1]
+        center[0] += dx * center[0]
+        center[1] += dy * center[1]
+        trans1 = get_transform(center, scale, (self.input_res, self.input_res), aug_rot)[:2]
+        trans2 = get_transform(center, scale, (self.output_res, self.output_res), aug_rot)[:2]
 
         # for img
-        #img = cv2.warpAffine(img.astype(np.uint8), trans1, (self.input_res, self.input_res))
+        img = cv2.warpAffine(img.astype(np.uint8), trans1, (self.input_res, self.input_res))
         img = (img / 255 - 0.5) * 2
 
         # for mask
         mask = ds.load_mask(idx)
-        #mask = cv2.warpAffine(mask.astype(np.uint8), trans2, (self.output_res, self.output_res))
+        mask = cv2.warpAffine(mask.astype(np.uint8), trans2, (self.output_res, self.output_res))
         #mask = imresize(mask, (self.output_res, self.output_res))
         mask = mask / 255
         mask[mask >= 0.5] = 1.0
@@ -61,7 +60,9 @@ class Dataset(torch.utils.data.Dataset):
 
         # ground true
         gt = ds.load_gt(idx)
-        #gt = cv2.warpAffine(gt.astype(np.uint8), trans2, (self.output_res, self.output_res))
+        gt_bg = gt[0, 0, :]
+        gt = cv2.warpAffine(gt.astype(np.uint8), trans2, (self.output_res, self.output_res))
+        gt[mask < 0.5] = gt_bg
         #gt = imresize(gt, (self.output_res, self.output_res))
         gt = (gt / 255 - 0.5) * 2
 
