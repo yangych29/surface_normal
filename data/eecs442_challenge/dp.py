@@ -29,7 +29,8 @@ class Dataset(torch.utils.data.Dataset):
         img = ds.load_image(idx)
 
         # data argumentation
-        trans = cv2.getRotationMatrix2D((64,64),0,1)
+        trans_aug = np.random.randint(360)
+        trans = cv2.getRotationMatrix2D((64,64), trans_aug, 1)
         trans_normal = np.eye(3)
         trans_normal[:2, :2] = trans[:2, :2]
         flip_aug = np.random.randint(2)
@@ -85,7 +86,7 @@ def init(config):
 
     loaders = {}
     for key in dataset:
-        loaders[key] = torch.utils.data.DataLoader(dataset[key], batch_size=batchsize, shuffle=True, num_workers=config['train']['num_workers'], pin_memory=False)
+        loaders[key] = torch.utils.data.DataLoader(dataset[key], batch_size=batchsize, shuffle=False, num_workers=config['train']['num_workers'], pin_memory=False)
 
     def gen(phase):
         batchsize = config['train']['batchsize']
