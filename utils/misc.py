@@ -30,7 +30,7 @@ def inv_mat(mat):
 
 def get_transform(center, scale, res, rot=0):
     # Generate transformation matrix
-    h = 200 * scale
+    h = 128 * scale
     t = np.zeros((3, 3))
     t[0, 0] = float(res[1]) / h
     t[1, 1] = float(res[0]) / h

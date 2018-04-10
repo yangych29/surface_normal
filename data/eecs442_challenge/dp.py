@@ -29,31 +29,20 @@ class Dataset(torch.utils.data.Dataset):
         img = ds.load_image(idx)
 
         # data argumentation
-        height, width, _ = img.shape
-        center = np.array((width/2, height/2))
-        scale = max(height, width)/200
-        inp_res = self.input_res
-        res = (inp_res, inp_res)
-        aug_rot = (np.random.random() * 2 - 1) * 30.
-        aug_rot = 0.0
-        aug_scale = np.random.random() * (1.25 - 0.75) + 0.75
-        aug_scale = 1.0
-        scale *= aug_scale
-        dx = np.random.randint(-40 * scale, 40 * scale)/center[0]
-        dy = np.random.randint(-40 * scale, 40 * scale)/center[1]
-        center[0] += dx * center[0]
-        center[1] += dy * center[1]
-        trans1 = get_transform(center, scale, (self.input_res, self.input_res), aug_rot)[:2]
-        trans2 = get_transform(center, scale, (self.output_res, self.output_res), aug_rot)[:2]
+        trans = cv2.getRotationMatrix2D((64,64),0,1)
+        trans_normal = np.eye(3)
+        trans_normal[:2, :2] = trans[:2, :2]
+        flip_aug = np.random.randint(2)
 
         # for img
-        img = cv2.warpAffine(img.astype(np.uint8), trans1, (self.input_res, self.input_res))
+        img = cv2.warpAffine(img.astype(np.uint8), trans, (self.input_res, self.input_res))
+        img = cv2.flip(img, flip_aug)
         img = (img / 255 - 0.5) * 2
 
         # for mask
         mask = ds.load_mask(idx)
-        mask = cv2.warpAffine(mask.astype(np.uint8), trans2, (self.output_res, self.output_res))
-        #mask = imresize(mask, (self.output_res, self.output_res))
+        mask = cv2.warpAffine(mask.astype(np.uint8), trans, (self.output_res, self.output_res))
+        mask = cv2.flip(mask, flip_aug)
         mask = mask / 255
         mask[mask >= 0.5] = 1.0
         mask[mask < 0.5] = 0.0
@@ -61,36 +50,25 @@ class Dataset(torch.utils.data.Dataset):
         # ground true
         gt = ds.load_gt(idx)
         gt_bg = gt[0, 0, :]
-        gt = cv2.warpAffine(gt.astype(np.uint8), trans2, (self.output_res, self.output_res))
+        gt = cv2.warpAffine(gt.astype(np.uint8), trans, (self.output_res, self.output_res))
+        gt = cv2.flip(gt, flip_aug)
         gt[mask < 0.5] = gt_bg
-        #gt = imresize(gt, (self.output_res, self.output_res))
         gt = (gt / 255 - 0.5) * 2
 
+        # rotate normal
+        gt = np.transpose(gt, (2, 0, 1))
+        gt = np.reshape(gt, (3, 128 * 128))
+        gt = np.matmul(trans_normal, gt)
+        gt = np.reshape(gt, (3, 128, 128))
+        gt = np.transpose(gt, (1, 2, 0))
+
+        # flip normal
+        if flip_aug == 1:
+            gt[:, :, 0] = - gt[:, :, 0]
+        else:
+            gt[:, :, 1] = - gt[:, :, 1]
+
         return img.astype(np.float32), mask.astype(np.float32), gt.astype(np.float32)
-
-    """
-    def preprocess(self, data):
-        # random hue and saturation
-        data = cv2.cvtColor(data, cv2.COLOR_RGB2HSV);
-        delta = (np.random.random() * 2 - 1) * 0.2
-        data[:, :, 0] = np.mod(data[:,:,0] + (delta * 360 + 360.), 360.)
-
-        delta_sature = np.random.random() + 0.5
-        data[:, :, 1] *= delta_sature
-        data[:,:, 1] = np.maximum( np.minimum(data[:,:,1], 1), 0 )
-        data = cv2.cvtColor(data, cv2.COLOR_HSV2RGB)
-
-        # adjust brightness
-        delta = (np.random.random() * 2 - 1) * 0.3
-        data += delta
-
-        # adjust contrast
-        mean = data.mean(axis=2, keepdims=True)
-        data = (data - mean) * (np.random.random() + 0.5) + mean
-        data = np.minimum(np.maximum(data, 0), 1)
-        #cv2.imwrite('x.jpg', (data*255).astype(np.uint8))
-        return data
-    """
 
 
 def init(config):
@@ -134,12 +112,12 @@ if __name__ == "__main__":
             'keys': ['imgs']
         },
         'train': {
-            'batchsize': 30,
+            'batchsize': 5,
             'input_res': 128,
-            'output_res': 64,
+            'output_res': 128,
             'train_iters': 600,
             'valid_iters': 0,
-            'num_workers': 2,
+            'num_workers': 1,
             'use_data_loader': True,
         },
     }
