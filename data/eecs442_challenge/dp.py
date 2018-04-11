@@ -29,7 +29,7 @@ class Dataset(torch.utils.data.Dataset):
         img = ds.load_image(idx)
 
         # data argumentation
-        trans_aug = np.random.randint(360)
+        trans_aug = np.random.randint(8) * 45
         #trans_aug = 0
         trans = cv2.getRotationMatrix2D((64,64), trans_aug, 1)
         trans_normal = np.eye(3)
