@@ -29,22 +29,23 @@ class Dataset(torch.utils.data.Dataset):
         img = ds.load_image(idx)
 
         # data argumentation
-        #trans_aug = np.random.randint(360)
-        #trans = cv2.getRotationMatrix2D((64,64), trans_aug, 1)
-        #trans_normal = np.eye(3)
-        #trans_normal[:2, :2] = trans[:2, :2]
+        trans_aug = np.random.randint(360)
+        #trans_aug = 0
+        trans = cv2.getRotationMatrix2D((64,64), trans_aug, 1)
+        trans_normal = np.eye(3)
+        trans_normal[:2, :2] = trans[:2, :2]
         flip_aug = np.random.randint(3)
-        #flip_aug = 2
+        #flip_aug = 0
 
         # for img
-        #img = cv2.warpAffine(img.astype(np.uint8), trans, (self.input_res, self.input_res))
+        img = cv2.warpAffine(img.astype(np.uint8), trans, (self.input_res, self.input_res))
         if flip_aug != 2:
             img = cv2.flip(img, flip_aug)
         img = (img / 255 - 0.5) * 2
 
         # for mask
         mask = ds.load_mask(idx)
-        #mask = cv2.warpAffine(mask.astype(np.uint8), trans, (self.output_res, self.output_res))
+        mask = cv2.warpAffine(mask.astype(np.uint8), trans, (self.output_res, self.output_res))
         if flip_aug != 2:
             mask = cv2.flip(mask, flip_aug)
         mask = mask / 255
@@ -53,21 +54,26 @@ class Dataset(torch.utils.data.Dataset):
 
         # ground true
         gt = ds.load_gt(idx)
-        gt_bg = gt[0, 0, :]
-        #gt = cv2.warpAffine(gt.astype(np.uint8), trans, (self.output_res, self.output_res))
+        gt_bg = gt[mask < 0.5, :].mean(axis=0)
+        gt = cv2.warpAffine(gt.astype(np.uint8), trans, (self.output_res, self.output_res))
         if flip_aug != 2:
             gt = cv2.flip(gt, flip_aug)
         gt[mask < 0.5] = gt_bg
         gt = (gt / 255 - 0.5) * 2
 
-        # rotate normal
-        #gt = np.transpose(gt, (2, 0, 1))
-        #gt = np.reshape(gt, (3, 128 * 128))
-        #gt = np.matmul(trans_normal, gt)
-        #gt = np.reshape(gt, (3, 128, 128))
-        #gt = np.transpose(gt, (1, 2, 0))
-
         # normalize surface normal
+        gt = np.transpose(gt, (2, 0, 1))
+        gt = gt / np.linalg.norm(gt, axis=0)
+        gt = np.transpose(gt, (1, 2, 0))
+
+        # rotate normal
+        gt = np.transpose(gt, (2, 0, 1))
+        gt = np.reshape(gt, (3, 128 * 128))
+        gt = np.matmul(trans_normal, gt)
+        gt = np.reshape(gt, (3, 128, 128))
+        gt = np.transpose(gt, (1, 2, 0))
+
+        # normalize surface normal again
         gt = np.transpose(gt, (2, 0, 1))
         gt = gt / np.linalg.norm(gt, axis=0)
         gt = np.transpose(gt, (1, 2, 0))
@@ -127,7 +133,7 @@ if __name__ == "__main__":
             'batchsize': 5,
             'input_res': 128,
             'output_res': 128,
-            'train_iters': 600,
+            'train_iters': 100,
             'valid_iters': 0,
             'num_workers': 1,
             'use_data_loader': True,
