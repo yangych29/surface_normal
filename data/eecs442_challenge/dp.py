@@ -28,14 +28,14 @@ class Dataset(torch.utils.data.Dataset):
         # load image
         img = ds.load_image(idx)
 
-        # data argumentation
-        trans_aug = np.random.randint(8) * 45
-        #trans_aug = 0
+        # data argumentation (closed by default)
+        #trans_aug = np.random.randint(8) * 45
+        trans_aug = 0
         trans = cv2.getRotationMatrix2D((64,64), trans_aug, 1)
         trans_normal = np.eye(3)
         trans_normal[:2, :2] = trans[:2, :2]
-        flip_aug = np.random.randint(3)
-        #flip_aug = 0
+        #flip_aug = np.random.randint(3)
+        flip_aug = 2
 
         # for img
         img = cv2.warpAffine(img.astype(np.uint8), trans, (self.input_res, self.input_res))
