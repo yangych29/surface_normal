@@ -1,6 +1,12 @@
 # Single-view Surface Normal Prediction
 This is the course project of EECS 442 Computer Vision (2018 Winter), University of Michigan.
 
+## Demo
+
+The left image is our network input, which is a gray-scale synthetic image. The right image is the network output, the color follows https://en.wikipedia.org/wiki/Normal_mapping
+
+![input](demo/input.png)![pred](demo/pred.png)
+
 ## Dependencies
 
 The code is tested on python3.6. Related packages include
