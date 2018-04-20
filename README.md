@@ -1,6 +1,12 @@
 # Single-view Surface Normal Prediction
 This is the course project of EECS 442 Computer Vision (2018 Winter), University of Michigan.
 
+## Group Member
+
+- Shengyi Qian ([@JasonQSY](https://github.com/JasonQSY))
+- Linyi Jin ([@jinlinyi](https://github.com/jinlinyi))
+- Yichen Yang ([@yangych29](https://github.com/yangych29))
+
 ## Demo
 
 The left image is our network input, which is a gray-scale synthetic image. The right image is the network output, the color follows https://en.wikipedia.org/wiki/Normal_mapping
@@ -9,7 +15,7 @@ The left image is our network input, which is a gray-scale synthetic image. The 
 
 ## Dependencies
 
-The code is tested on python3.6. Related packages include
+The code is tested on python3.6. Required packages include
 
 - pytorch
 - opencv
@@ -17,6 +23,8 @@ The code is tested on python3.6. Related packages include
 - scipy
 - imageio
 - tqdm
+
+It is only tested on Ubuntu 16.04 LTS with CUDA. But it should be able to run on any Unix-like platform.
 
 ## Training
 
@@ -42,21 +50,13 @@ The training code would automatically save `${model}_${epoch}` under `exp`. For 
 
 ## Evaluation
 
-Evaluation is a separate pipeline. Firstly, we need generate the predictions.
+To generate the prediction, run
 
 ```bash
 rm -rf save
 mkdir save
 python generate.py -c sn_full -e sn_full -t sn
 ```
-
-Then we use evaluation code to calculate mean angle error (MAE).
-
-```bash
-python evaluate.py -p save -g ~/datasets/eecs442challenge/train/normal/
-```
-
-These can be done directly by `test.sh`.
 
 ## Ensemble
 
